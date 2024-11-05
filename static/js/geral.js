@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-// Fechar o modal quando o usuário clicar fora do modal
 window.onclick = function (event) {
   const modal = document.getElementById("customAlert");
   if (event.target === modal) {
@@ -51,11 +50,9 @@ function togglePopup() {
   const loginPopup = document.getElementById("login-popup");
 
   if (registerPopup.style.display === "none" || !registerPopup.style.display) {
-    // Exibe o popup de registro e oculta o de login
     registerPopup.style.display = "block";
     loginPopup.style.display = "none";
   } else {
-    // Exibe o popup de login e oculta o de registro
     registerPopup.style.display = "none";
     loginPopup.style.display = "block";
   }

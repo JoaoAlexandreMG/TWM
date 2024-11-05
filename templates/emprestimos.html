@@ -7,24 +7,17 @@
     <title>Gestão de Empréstimos | PET Elétrica UFU</title>
     <link rel="stylesheet" href="../static/css/style.css" />
     <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
-    />
-
-    <link
       rel="shortcut icon"
       href="https://peteletricaufu.com.br/pet/wp-content/uploads/2023/09/cropped-cropped-logopet.png"
       type="image/x-icon"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
   </head>
 
   <body>
-    <div id="customAlert" class="modal">
-      <div class="modal-content">
-        <span class="close-btn-alert">&times;</span>
-        <p id="alertMessage">Mensagem do alerta!</p>
-      </div>
-    </div>
     <div class="container">
       <div class="navigation">
         <ul>
@@ -99,9 +92,7 @@
               class="borrow-popup-input"
               placeholder="Pesquisar..."
             />
-            <select id="userSelect" class="borrow-popup-select">
-              select
-            </select>
+            <select id="userSelect" class="borrow-popup-select"></select>
           </div>
 
           <div class="borrow-popup-section">
@@ -113,9 +104,7 @@
               placeholder="Pesquisar..."
             />
             <div id="itemSelectContainer">
-              <select id="itemSelect" class="borrow-popup-select">
-                select
-              </select>
+              <select id="itemSelect" class="borrow-popup-select"></select>
               <label for="itemQuantityInput">Quantidade:</label>
               <select
                 id="itemQuantityInput"
@@ -217,6 +206,7 @@
                   <td>Quantidade</td>
                   <td>Data de Empréstimo</td>
                   <td>Dias de Atraso</td>
+                  <td></td>
                 </tr>
               </thead>
 

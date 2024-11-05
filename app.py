@@ -15,10 +15,9 @@ import requests
 
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"  # Chave secreta para criptografar sessões
+app.secret_key = "supersecretkey"
 
 
-# Configurações do banco de dados
 DB_CONFIG = {
     "dbname": "pet_eletrica",
     "user": "postgres",
@@ -37,14 +36,6 @@ def get_db_connection():
     :rtype: psycopg2.extensions.connection
     """
     return psycopg2.connect(**DB_CONFIG)
-
-
-@app.route("/clear_cache", methods=["GET"])
-def clear_cache():
-    """
-    Rota para limpar todos os caches e redirecionar para a dashboard.
-    """
-    return redirect(url_for("index"))
 
 
 @app.route("/", methods=["GET"])
@@ -93,18 +84,14 @@ def cadastrar_usuario():
     conn = get_db_connection()
     cur = conn.cursor()
     try:
-        # Verificar se o usuário já existe
         cur.execute("SELECT COUNT(*) FROM usuarios_painel WHERE email = %s", (email,))
         if cur.fetchone()[0] > 0:
             return jsonify({"status": "error", "message": "Usuário já cadastrado"})
 
-        # Gerar hash da senha
         hashed_password = hashlib.sha256(senha.encode()).hexdigest()
 
-        # Ler o conteúdo da imagem como binário
         foto_binaria = foto_file.read() if foto_file else None
 
-        # Inserir novo usuário
         cur.execute(
             "INSERT INTO usuarios_painel (nome, email, senha, data_cadastro, imagem_perfil) VALUES (%s, %s, %s, %s, %s)",
             (nome, email, hashed_password, data_cadastro, foto_binaria),
@@ -157,7 +144,7 @@ def login():
         if result2 is None:
             return jsonify({"status": "error", "message": "Senha inválida!"})
 
-        session["user"] = email  # Salva o usuário na sessão
+        session["user"] = email
         return jsonify({"status": "success", "message": "Login bem-sucedido"})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)})
@@ -176,7 +163,7 @@ def logout():
     """
 
     if "user" in session:
-        session.pop("user", None)  # Remove o usuário da sessão
+        session.pop("user", None)
         return render_template("login_e_cadastro.html")
     else:
         return render_template("login_e_cadastro.html")
@@ -828,12 +815,10 @@ def edit_item():
         cur = conn.cursor()
 
         try:
-            # Verificar se o item existe
             cur.execute("SELECT * FROM itens WHERE id = %s", (item_id,))
             if not cur.fetchone():
                 return jsonify({"status": "error", "message": "Item não encontrado."})
 
-            # Atualizar o nome e a quantidade do item
             cur.execute(
                 "UPDATE itens SET nome = %s, estoque = %s, localizacao = %s WHERE id = %s",
                 (item_name, item_quantity, item_location, item_id),
@@ -943,6 +928,41 @@ def get_estoque():
 
             conn.commit()
             return jsonify(*item_row)
+        except Exception as e:
+            conn.rollback()
+            print(f"Erro: {str(e)}")
+            return jsonify({"status": "error", "message": str(e)})
+        finally:
+            cur.close()
+            conn.close()
+    else:
+        return render_template("login_e_cadastro.html")
+
+
+@app.route("/get_telefone_usuario", methods=["GET"])
+def get_telefone_usuario():
+    """
+    Retorna o telefone do usuário com base no ID do emprestimo.
+
+    A resposta é um JSON com o telefone do usuario.
+
+    A resposta é cacheada por 0 segundos, portanto a telefone do usuario em estoque é atualizada a cada requisição.
+    """
+    if "user" in session:
+        emprestimo_id = request.args.get("emprestimo_id")
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        try:
+            cur.execute(
+                "SELECT telefone FROM usuarios WHERE id = (SELECT usuario_id FROM itens_historico WHERE id = %s)",
+                (emprestimo_id,),
+            )
+            telefone = cur.fetchone()
+
+            conn.commit()
+            return jsonify(*telefone)
         except Exception as e:
             conn.rollback()
             print(f"Erro: {str(e)}")

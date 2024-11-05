@@ -27,6 +27,26 @@ function getActiveBorrows() {
       console.error("Erro ao carregar emprestimos ativos:", error)
     );
 }
+function Cobrar(
+  emprestimo_id,
+  usuario_nome,
+  item_nome,
+  item_qntd,
+  data_emprestimo,
+  dias_atraso
+) {
+  fetch("/get_telefone_usuario?emprestimo_id=" + emprestimo_id)
+    .then((response) => response.json())
+    .then((data) => {
+      const phone = data;
+      const mensagem_atraso = `Olá ${usuario_nome}, o empréstimo de ${item_qntd}x ${item_nome} do dia ${data_emprestimo} está com ${dias_atraso} dia/dias de atraso!`;
+      const url = `https://wa.me/55${phone}?text=${encodeURIComponent(
+        mensagem_atraso
+      )}`;
+      window.open(url, "_blank");
+    });
+}
+
 function getDelayedBorrows() {
   fetch("/get_emprestimos_atrasados")
     .then((response) => response.json())
@@ -35,10 +55,11 @@ function getDelayedBorrows() {
       data.forEach((item) => {
         html += `<tr>
       <td>${item.usuario_nome}</td>
-      <td>${item.item_nome}</td>
+      <td>${item.item_nome}</td>s
       <td>${item.item_qntd}</td>
       <td>${item.data_emprestimo}</td>
       <td>${item.dias_atraso}</td>
+      <td><button id="cobrar_bt" onclick="Cobrar('${item.emprestimo_id}', '${item.usuario_nome}', '${item.item_nome}', '${item.item_qntd}', '${item.data_emprestimo}', '${item.dias_atraso}')" style="font-size:24px">Cobrar <i class="fa fa-whatsapp"></i></button></td>
       </tr>`;
       });
       if (html == "") {
@@ -166,29 +187,21 @@ function borrowItemList() {
     });
 }
 function deleteItemInList(item_id) {
-  // Converte o item_id para um número
   const itemIdNumber = Number(item_id);
-
-  // Encontra o índice do item na lista 'itens'
   const itemIndex = itens.findIndex((item) => Number(item[0]) === itemIdNumber);
 
-  // Remove o item da lista 'itens'
   itens.splice(itemIndex, 1);
 
-  // Atualiza a lista na interface do usuário
   const itemList = document.getElementById("lista_de_itens");
-  itemList.innerHTML = ""; // Limpa a lista atual
+  itemList.innerHTML = "";
 
-  // Reconstroi a lista atualizada buscando os nomes dos itens
   itens.forEach((item) => {
     const item_id = item[0];
     const quantity = item[1];
 
-    // Busca o nome do item antes de adicioná-lo à lista
     fetch(`/get_item?item_id=${item_id}`)
       .then((response) => response.json())
       .then((data) => {
-        // Adiciona o item com o nome correto na lista
         itemList.innerHTML += `
         <li class="borrow-item">
         <span class="item-quantity">${quantity} x ${data.nome}</span>
@@ -214,7 +227,6 @@ function borrowItem() {
     "DevolucaoPrevistaInput"
   ).value;
 
-  // Verificar se todos os campos foram preenchidos
   if (!DevolucaoPrevista) {
     showCustomAlert(
       "Por favor, coloque a data prevista para devolução.",
@@ -262,7 +274,6 @@ function showBorrowItemPopup() {
         )
         .join("");
 
-      // Resetar o valor da data prevista de devolução
       document.getElementById("borrowItemPopup").style.display = "flex";
       document.getElementById("DevolucaoPrevistaInput").value = "";
       document.getElementById("searchItemInput").value = "";
@@ -302,25 +313,22 @@ document
 document
   .getElementById("searchUserInput")
   .addEventListener("input", function () {
-    const searchTerm = this.value.toLowerCase(); // Termo de busca digitado pelo usuário
-    const content = document.getElementById("userSelect"); // Elemento da lista de opções
+    const searchTerm = this.value.toLowerCase();
+    const content = document.getElementById("userSelect");
 
     fetch(`/get_users`)
       .then((response) => response.json())
       .then((users) => {
-        let html = ""; // Variável para armazenar o HTML das opções
+        let html = "";
 
-        // Filtrando usuários pelo nome com base no termo de busca
         const filteredUsers = users.filter((user) =>
           user[2].toLowerCase().includes(searchTerm)
         );
 
-        // Iterando sobre a lista de usuários filtrados para criar as opções
         filteredUsers.forEach((user) => {
           html += `<option value="${user[0]}">${user[2]}</option>`;
         });
 
-        // Atualizando o conteúdo do select com as novas opções
         content.innerHTML = html;
       })
       .catch((error) => {
@@ -329,20 +337,17 @@ document
   });
 
 function GetEstoque() {
-  const content = document.getElementById("itemQuantityInput"); // Pegando o elemento da lista de opções
-  const itemId = document.getElementById("itemSelect").value; // Pegando o ID do item selecionado
+  const content = document.getElementById("itemQuantityInput");
+  const itemId = document.getElementById("itemSelect").value;
 
-  let html = ""; // Variável para armazenar o HTML das opções
+  let html = "";
   if (itemId) {
-    // Fazendo a requisição para buscar o estoque do item
     fetch(`/get_estoque?item_id=${itemId}`)
       .then((response) => response.json())
       .then((data) => {
-        // Iterar de 1 até o valor de 'data', criando opções
         for (let i = 1; i <= data; i++) {
           html += `<option>${i}</option>`;
         }
-        // Atualizando o conteúdo do select com as novas opções
         content.innerHTML = html;
       })
       .catch((error) => {
@@ -351,20 +356,17 @@ function GetEstoque() {
   }
 }
 function GetUsers() {
-  const content = document.getElementById("userSelect"); // Pegando o elemento da lista de opções
+  const content = document.getElementById("userSelect");
 
-  let html = ""; // Variável para armazenar o HTML das opções
+  let html = "";
 
-  // Fazendo a requisição para buscar os usuários
   fetch(`/get_users`)
     .then((response) => response.json())
     .then((users) => {
-      // Iterar sobre a lista de usuários, criando opções
       users.forEach((user) => {
         html += `<option value="${user[0]}">${user[2]}</option>`;
       });
 
-      // Atualizando o conteúdo do select com as novas opções
       content.innerHTML = html;
     })
     .catch((error) => {

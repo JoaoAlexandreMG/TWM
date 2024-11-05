@@ -10,11 +10,10 @@ function ocultarCPF(cpf) {
 }
 
 function CPF(v) {
-  v = v.replace(/\D/g, ""); //Remove tudo o que não é dígito
-  v = v.replace(/(\d{3})(\d)/, "$1.$2"); //Coloca um ponto entre o terceiro e o quarto dígitos
-  v = v.replace(/(\d{3})(\d)/, "$1.$2"); //Coloca um ponto entre o terceiro e o quarto dígitos
-  //de novo (para o segundo bloco de números)
-  v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); //Coloca um hífen entre o terceiro e o quarto dígitos
+  v = v.replace(/\D/g, "");
+  v = v.replace(/(\d{3})(\d)/, "$1.$2"); 
+  v = v.replace(/(\d{3})(\d)/, "$1.$2"); 
+  v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); 
   return v;
 }
 
@@ -32,7 +31,6 @@ function searchUsers() {
   fetch(`/get_users?search=${search}`)
     .then((response) => response.json())
     .then((users) => {
-      // Ordenar usuários por ID (menor para maior)
       users.sort((a, b) => a[0] - b[0]);
 
       const userResults = document.getElementById("userResults");
@@ -154,7 +152,6 @@ function openEditUserPopup(userId, nome, cpf, telefone, curso, email) {
   document.getElementById("editUserEmail").value = email;
   document.getElementById("editUserPhone").value = phoneMask(telefone);
 }
-// Submeter Edição de Usuário
 document
   .getElementById("editUserForm")
   .addEventListener("submit", function (event) {
@@ -186,7 +183,7 @@ document
         if (data.status === "success") {
           showCustomAlert("Usuário editado com sucesso!", "success");
           closePopup("editUserPopup");
-          searchUsers(); // Atualiza a lista de usuários após a edição
+          searchUsers(); 
         } else {
           showCustomAlert("Erro ao editar o usuário: " + data.message, "error");
         }

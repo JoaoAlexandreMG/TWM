@@ -1,24 +1,20 @@
 window.onload = searchItems;
 function searchItems() {
-  const search = document.getElementById("itemSearch").value.toLowerCase(); // Pega o valor da barra de pesquisa e converte para minúsculas
+  const search = document.getElementById("itemSearch").value.toLowerCase(); 
 
-  fetch(`/get_items?search=${search}`) // Passa o termo de pesquisa para o backend
+  fetch(`/get_items?search=${search}`) 
     .then((response) => response.json())
     .then((items) => {
       const itemResults = document.getElementById("itemResults");
 
-      // Limpa os resultados anteriores
       itemResults.innerHTML = "";
 
-      // Filtrar itens com base no termo de pesquisa
       const filteredItems = items.filter((item) =>
         item[1].toLowerCase().includes(search)
       );
 
-      // Ordena os itens por ID em ordem crescente
       filteredItems.sort((a, b) => a[0] - b[0]);
 
-      // Verifica se há itens filtrados
       if (filteredItems.length > 0) {
         filteredItems.forEach((item) => {
           const row = `
@@ -54,7 +50,6 @@ function openEditItemPopup(itemId, itemName, itemQuantity, itemLocation) {
 }
 document.getElementById("itemSearch").addEventListener("input", searchItems);
 
-// Submeter Edição de Item
 document
   .getElementById("editItemForm")
   .addEventListener("submit", function (event) {
@@ -86,7 +81,6 @@ document
         showCustomAlert("Erro ao editar o item: " + error, "error");
       });
   });
-// Adicionar evento de submissão para o formulário de adicionar item
 document
   .getElementById("addItemForm")
   .addEventListener("submit", function (event) {
@@ -112,7 +106,7 @@ document
         if (data.status === "success") {
           showCustomAlert("Item adicionado com sucesso!", "success");
           closePopup("addItemPopup");
-          searchItems(); // Atualiza a lista de itens
+          searchItems(); 
         } else {
           showCustomAlert(data.message, "success");
         }
@@ -139,7 +133,7 @@ async function deleteItem(itemId) {
       .then((data) => {
         if (data.status === "success") {
           showCustomAlert("Item excluído com sucesso!", "success");
-          searchItems(); // Atualiza a lista de itens
+          searchItems(); 
         } else {
           showCustomAlert(data.message, "success");
         }
